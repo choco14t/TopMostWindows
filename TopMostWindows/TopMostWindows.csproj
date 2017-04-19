@@ -58,6 +58,8 @@
     <Compile Include="RECT.cs" />
     <Compile Include="SetWindowPosFlags.cs" />
     <Compile Include="HwndInsertAfter.cs" />
+    <Compile Include="TopMostWindow.cs" />
+    <Compile Include="VirtualKeys.cs" />
     <EmbeddedResource Include="frmStart.resx">
       <DependentUpon>frmStart.cs</DependentUpon>
     </EmbeddedResource>
@@ -82,6 +84,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\Windows_32px_583033_easyicon.net.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

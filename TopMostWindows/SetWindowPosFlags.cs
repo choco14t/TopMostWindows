@@ -5,7 +5,7 @@
     /// </summary>
     public static class SetWindowPosFlags
     {
-        public static readonly int
+        public static readonly uint
         NOSIZE = 0x0001,
         NOMOVE = 0x0002,
         NOZORDER = 0x0004,

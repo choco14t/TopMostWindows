@@ -34,5 +34,14 @@ namespace TopMostWindows
         /// get verical length of RECT.
         /// </summary>
         public int Height { get { return this.Bottom - this.Top + 1; } }
+
+        public void Initialize()
+        {
+            this.Left = 0;
+            this.Top = 0;
+            this.Right = 0;
+            this.Bottom = 0;
+        }
+
     }
 }
