@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Windows.Forms;
 
 namespace TopMostWindows
@@ -10,14 +12,13 @@ namespace TopMostWindows
     public partial class frmStart : Form
     {
 
-        private TopMostWindow _tmWindow;
+        private Dictionary<TopMostWindow, string> _dicWindows;
         private ushort _hotKeyID;
-        private RECT _wRect;
 
         public frmStart()
         {
             InitializeComponent();
-            this._tmWindow = new TopMostWindow();
+            this._dicWindows = new Dictionary<TopMostWindow, string>();
         }
 
         protected override CreateParams CreateParams
@@ -32,21 +33,19 @@ namespace TopMostWindows
 
         private void frmStart_FormClosing(object sender, FormClosingEventArgs e)
         {
-            NativeMethods.UnregisterHotKey(this.Handle, this._hotKeyID);
-            NativeMethods.GlobalDeleteAtom(this._hotKeyID);
+            HotKeyManager.Instance.Unregister(this.Handle, this._hotKeyID);
 
-            if (this._tmWindow.Hwnd != IntPtr.Zero)
+            foreach (KeyValuePair<TopMostWindow, string> item in this._dicWindows)
             {
-                // TODO:解放時は現在の座標を取得する。
-                NativeMethods.SetWindowPos(this._tmWindow.Hwnd, HwndInsertAfter.NoTopMost, this._tmWindow.Wrect.Left, this._tmWindow.Wrect.Top, this._tmWindow.Wrect.Width, this._tmWindow.Wrect.Height, SetWindowPosFlags.NOSIZE | SetWindowPosFlags.NOMOVE);
-                MessageBox.Show("Unregistered.");
+                NativeMethods.SetWindowPos(item.Key.Hwnd, HwndInsertAfter.NoTopMost, 0, 0, 0, 0, SetWindowPosFlags.NOSIZE | SetWindowPosFlags.NOMOVE);
+                MessageBox.Show(item.Value + " Unregistered.");
             }
+
         }
 
         private void frmStart_Load(object sender, EventArgs e)
         {
-            this._hotKeyID = NativeMethods.GlobalAddAtom("MyHotKey");
-            NativeMethods.RegisterHotKey(this.Handle, this._hotKeyID, 0, VirtualKeys.VK_SCROLL);
+            HotKeyManager.Instance.Register(this.Handle, out this._hotKeyID);
         }
 
         private void mnuiExit_Click(object sender, EventArgs e)
@@ -59,18 +58,21 @@ namespace TopMostWindows
 
             if (m.Msg == NativeMethods.WM_HOTKEY)
             {
-                if (this._tmWindow.Hwnd == IntPtr.Zero)
+                TopMostWindow tm = new TopMostWindow(NativeMethods.GetForegroundWindow());
+                StringBuilder sb = new StringBuilder();
+
+                sb.Capacity = NativeMethods.GetWindowTextLength(tm.Hwnd);
+                NativeMethods.GetWindowText(tm.Hwnd, sb, sb.Capacity + 1);
+                NativeMethods.SetWindowPos(tm.Hwnd, HwndInsertAfter.TopMost, 0, 0, 0, 0, SetWindowPosFlags.NOSIZE | SetWindowPosFlags.NOMOVE);
+                if (!this._dicWindows.ContainsKey(tm))
                 {
-                    this._tmWindow.Hwnd = NativeMethods.GetForegroundWindow();
-                    NativeMethods.GetWindowRect(this._tmWindow.Hwnd, out this._wRect);
-                    this._tmWindow.SetWndRect(this._wRect);
-                    NativeMethods.SetWindowPos(this._tmWindow.Hwnd, HwndInsertAfter.TopMost, this._wRect.Left, this._wRect.Top, this._wRect.Width, this._wRect.Height, SetWindowPosFlags.NOSIZE | SetWindowPosFlags.NOMOVE);
-                    MessageBox.Show("Registered.");
-                }                
+                    this._dicWindows.Add(tm, sb.ToString());
+                    MessageBox.Show(sb.ToString() + " Registered.");
+                }
+
             }
 
             base.WndProc(ref m);
-
         }
 
     }

@@ -10,24 +10,11 @@ namespace TopMostWindows
     {
 
         public IntPtr Hwnd { get; set; }
-        public RECT Wrect { get; set; }
+        public byte Opacity { get; set; }
 
-        public void SetProperty(IntPtr hWnd, RECT wRect)
+        public TopMostWindow(IntPtr hWnd)
         {
             this.Hwnd = hWnd;
-            this.Wrect = wRect;
         }
-
-        public void SetWndRect(RECT wRect)
-        {
-            this.Wrect = wRect;
-        }
-
-        public void Release()
-        {
-            this.Hwnd = IntPtr.Zero;
-            this.Wrect.Initialize();
-        }
-
     }
 }
